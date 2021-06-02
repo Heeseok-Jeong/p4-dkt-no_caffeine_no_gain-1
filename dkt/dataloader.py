@@ -83,13 +83,16 @@ class Preprocess:
 
         self.args.USERID_COLUMN = ['userID']
         self.args.ANSWER_COLUMN = ['answerCode']
-        self.args.USE_COLUMN = ['KnowledgeTag', 'assessmentItemID', 'classification', 'paperNum', 'problemNum', 'elapsed', 'time_bin', 'hours']
-        self.args.EXCLUDE_COLUMN = ['testId', 'Timestamp']
+        self.args.USE_COLUMN = ['assessmentItemID', 'classification', 'paperNum', 'problemNum', 'elapsed', 'elapsed_continuous', 'KnowledgeTag']
+        self.args.continuous_embedding = [0, 0, 0, 0, 0, 1, 0]
+        self.args.EXCLUDE_COLUMN = ['testId', 'Timestamp', 'time_bin', 'hours']
+
 
         # use 3 features instead testId, assessmentItemID
         df['classification'] = df['testId'].str[2:3]
         df['paperNum'] = df['testId'].str[-3:]
         df['problemNum'] = df['assessmentItemID'].str[-3:]
+        df['elapsed_continuous'] = df['elapsed']
 
         df = df.astype({'Timestamp': 'datetime64[ns]'})
         def hours(timestamp):

@@ -5,12 +5,11 @@ import numpy as np
 import copy
 import math
 
+from dkt.modeling_embedding import ContinuousEmbedding
 try:
     from transformers.modeling_bert import BertConfig, BertEncoder, BertModel    
 except:
-    from transformers.models.bert.modeling_bert import BertConfig, BertEncoder, BertModel    
-
-
+    from transformers.models.bert.modeling_bert import BertConfig, BertEncoder, BertModel
 
 
 class LSTM(nn.Module):
@@ -26,15 +25,15 @@ class LSTM(nn.Module):
 
         # Embedding 
         # interaction은 현재 correct로 구성되어있다. correct(1, 2) + padding(0)
-        self.embedding_interaction = nn.Embedding(3, self.hidden_dim // self.args.dim_div)
+        self.embedding_interaction = ContinuousEmbedding(3, self.hidden_dim // self.args.dim_div, num_points=self.args.max_seq_len)
         self.embedding_features = nn.ModuleList([])
-        for value in self.args.n_embedding_layers:
-            self.embedding_features.append(nn.Embedding(value + 1, self.hidden_dim // self.args.dim_div))
+        for idx, value in enumerate(self.args.n_embedding_layers):
+            if self.args.continuous_embedding[idx] == 0:
+                self.embedding_features.append(nn.Embedding(value + 1, self.hidden_dim // self.args.dim_div))
+            else:
+                self.embedding_features.append(ContinuousEmbedding(value + 1, self.hidden_dim // self.args.dim_div, num_points=self.args.max_seq_len))
 
         #self.embedding_classification = nn.Embedding(self.args.n_class + 1, self.hidden_dim//3)
-        #self.embedding_paperNum = nn.Embedding(self.args.n_paper + 1, self.hidden_dim//3)
-        #self.embedding_problemNum = nn.Embedding(self.args.n_problem + 1, self.hidden_dim//3)
-        #self.embedding_tag = nn.Embedding(self.args.n_tag + 1, self.hidden_dim//3)
 
         # embedding combination projection
         # +1은 interaction
@@ -211,10 +210,13 @@ class Bert(nn.Module):
 
         # Embedding
         # interaction은 현재 correct로 구성되어있다. correct(1, 2) + padding(0)
-        self.embedding_interaction = nn.Embedding(3, self.hidden_dim // self.args.dim_div)
+        self.embedding_interaction = ContinuousEmbedding(3, self.hidden_dim // self.args.dim_div)
         self.embedding_features = nn.ModuleList([])
-        for value in self.args.n_embedding_layers:
-            self.embedding_features.append(nn.Embedding(value + 1, self.hidden_dim // self.args.dim_div))
+        for idx, value in enumerate(self.args.n_embedding_layers):
+            if self.args.continuous_embedding[idx] == 0:
+                self.embedding_features.append(nn.Embedding(value + 1, self.hidden_dim // self.args.dim_div))
+            else:
+                self.embedding_features.append(ContinuousEmbedding(value + 1, self.hidden_dim // self.args.dim_div))
 
         # embedding combination projection
         self.comb_proj = nn.Linear((self.hidden_dim//self.args.dim_div)*(len(self.args.n_embedding_layers)+1), self.hidden_dim)

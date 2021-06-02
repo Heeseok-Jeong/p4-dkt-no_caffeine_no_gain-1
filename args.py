@@ -28,7 +28,7 @@ def parse_args(mode='train'):
     parser.add_argument('--num_workers', default=1, type=int, help='number of workers')
 
     # 모델
-    parser.add_argument('--hidden_dim', default=64, type=int, help='hidden dimension size')
+    parser.add_argument('--hidden_dim', default=2048, type=int, help='hidden dimension size')
     parser.add_argument('--n_layers', default=2, type=int, help='number of layers')
     parser.add_argument('--n_heads', default=2, type=int, help='number of heads')
     parser.add_argument('--drop_out', default=0.1, type=float, help='drop out rate')
