@@ -69,13 +69,6 @@ class Preprocess:
             df[col]= df[col].astype(str)
             test = le.transform(df[col])
             df[col] = test
-            
-
-        def convert_time(s):
-            timestamp = time.mktime(datetime.strptime(s, '%Y-%m-%d %H:%M:%S').timetuple())
-            return int(timestamp)
-
-        df['Timestamp'] = df['Timestamp'].apply(convert_time)
         
         return df
 
@@ -83,9 +76,9 @@ class Preprocess:
 
         self.args.USERID_COLUMN = ['userID']
         self.args.ANSWER_COLUMN = ['answerCode']
-        self.args.USE_COLUMN = ['assessmentItemID', 'classification', 'paperNum', 'problemNum', 'elapsed', 'elapsed_continuous', 'KnowledgeTag']
-        self.args.continuous_embedding = [0, 0, 0, 0, 0, 1, 0]
-        self.args.EXCLUDE_COLUMN = ['testId', 'Timestamp', 'time_bin', 'hours']
+        self.args.USE_COLUMN = ['assessmentItemID', 'classification', 'paperNum', 'problemNum', 'elapsed', 'elapsed_continuous', 'Timestamp_int', 'KnowledgeTag']
+        self.args.continuous_embedding = [0, 0, 0, 0, 0, 1, 1, 0]
+        self.args.EXCLUDE_COLUMN = ['testId',  'time_bin', 'hours', 'Timestamp']
 
 
         # use 3 features instead testId, assessmentItemID
@@ -116,6 +109,12 @@ class Preprocess:
         
         df["time_bin"] = df.hours.apply(time_bin)
         df = df.astype({'Timestamp': 'str'})
+
+        def convert_time(s):
+            timestamp = time.mktime(datetime.strptime(s, '%Y-%m-%d %H:%M:%S').timetuple())
+            return int(timestamp)
+
+        df['Timestamp_int'] = df['Timestamp'].apply(convert_time)
 
         assert df.head().shape[1] == len(self.args.USERID_COLUMN) + len(self.args.ANSWER_COLUMN) + len(
             self.args.USE_COLUMN) + len(self.args.EXCLUDE_COLUMN)

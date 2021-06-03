@@ -62,15 +62,15 @@ class ContinuousEmbedding(Module):
             self.window_func = self._rect_window
         self.sparse = sparse
 
-    def _rect_window(self, x, window_size=3):
+    def _rect_window(self, x, window_size=5):
         w_2 = window_size / 2
         return (torch.sign(x + w_2) - torch.sign(x - w_2)) / 2
 
-    def _triangle_window(self, x, window_size=3):
+    def _triangle_window(self, x, window_size=5):
         w_2 = window_size / 2
         return (torch.abs(x + w_2) + torch.abs(x - w_2) - 2 * torch.abs(x)) / window_size
 
-    def _hann_window(self, x, window_size=3):
+    def _hann_window(self, x, window_size=5):
         y = torch.cos(np.math.pi * x / window_size)
         y = y * y * self._rect_window(x, window_size=window_size)
         return y
