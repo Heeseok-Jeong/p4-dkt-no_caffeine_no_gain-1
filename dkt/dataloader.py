@@ -51,9 +51,7 @@ class Preprocess:
         if not os.path.exists(self.args.asset_dir):
             os.makedirs(self.args.asset_dir)
             
-        for col in cate_cols:
-            
-            
+        for col in cate_cols:            
             le = LabelEncoder()
             if is_train:
                 #For UNKNOWN class
@@ -69,6 +67,12 @@ class Preprocess:
             df[col]= df[col].astype(str)
             test = le.transform(df[col])
             df[col] = test
+
+        def convert_time(s):
+            timestamp = time.mktime(datetime.strptime(s, '%Y-%m-%d %H:%M:%S').timetuple())
+            return int(timestamp) 
+
+        df['Timestamp'] = df['Timestamp'].apply(convert_time)
         
         return df
 
@@ -79,7 +83,6 @@ class Preprocess:
         self.args.USE_COLUMN = ['assessmentItemID', 'classification', 'paperNum', 'problemNum', 'elapsed', 'elapsed_continuous', 'Timestamp_int', 'KnowledgeTag']
         self.args.continuous_embedding = [0, 0, 0, 0, 0, 1, 1, 0]
         self.args.EXCLUDE_COLUMN = ['testId',  'time_bin', 'hours', 'Timestamp']
-
 
         # use 3 features instead testId, assessmentItemID
         df['classification'] = df['testId'].str[2:3]
@@ -129,7 +132,7 @@ class Preprocess:
         df = pd.read_csv(csv_file_path)#, nrows=100000)
         df = self.__feature_engineering(df)
         df = self.__preprocessing(df, is_train)
-
+        
         # 추후 feature를 embedding할 시에 embedding_layer의 input 크기를 결정할때 사용
         self.args.n_embedding_layers = []       # 나중에 사용할 떄 embedding key들을 저장
         for idx, val in enumerate(self.args.USE_COLUMN):
@@ -152,6 +155,7 @@ class Preprocess:
             print(f"{splited_file_name} is loaded!")
         else:
             print("There is no splited data.")
+            
             aug = group.copy()
             idx = 0
             n_col = len(columns)-1
