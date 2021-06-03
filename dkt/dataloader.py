@@ -4,7 +4,7 @@ import time
 import tqdm
 import pandas as pd
 import random
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 import numpy as np
 import torch
 import pickle
@@ -80,9 +80,9 @@ class Preprocess:
 
         self.args.USERID_COLUMN = ['userID']
         self.args.ANSWER_COLUMN = ['answerCode']
-        self.args.USE_COLUMN = ['assessmentItemID', 'classification', 'paperNum', 'problemNum', 'elapsed', 'elapsed_continuous', 'Timestamp_int', 'KnowledgeTag']
-        self.args.continuous_embedding = [0, 0, 0, 0, 0, 1, 1, 0]
-        self.args.EXCLUDE_COLUMN = ['testId',  'time_bin', 'hours', 'Timestamp']
+        self.args.USE_COLUMN = ['assessmentItemID', 'classification', 'paperNum', 'problemNum', 'elapsed',  'Timestamp_2', 'KnowledgeTag']
+        self.args.continuous_embedding = [0, 0, 0, 0, 0, 0, 0]
+        self.args.EXCLUDE_COLUMN = ['testId',  'time_bin', 'hours', 'elapsed_continuous', 'Timestamp']
 
         # use 3 features instead testId, assessmentItemID
         df['classification'] = df['testId'].str[2:3]
@@ -115,9 +115,13 @@ class Preprocess:
 
         def convert_time(s):
             timestamp = time.mktime(datetime.strptime(s, '%Y-%m-%d %H:%M:%S').timetuple())
-            return int(timestamp)
+            timestamp = str(timestamp)
+            timestamp_2 = timestamp[4:10]
+            return int(timestamp_2)
 
-        df['Timestamp_int'] = df['Timestamp'].apply(convert_time)
+        tqdm.pandas()
+
+        df['Timestamp_2'] = df['Timestamp'].progress_apply(convert_time) # timestamp는 embedding값이 너무 커짐 -> normalize 필요
 
         assert df.head().shape[1] == len(self.args.USERID_COLUMN) + len(self.args.ANSWER_COLUMN) + len(
             self.args.USE_COLUMN) + len(self.args.EXCLUDE_COLUMN)
