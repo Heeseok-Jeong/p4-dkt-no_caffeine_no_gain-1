@@ -49,7 +49,7 @@ def parse_args(mode='train'):
     parser.add_argument('--stride', default=1, type=int, help='Sliding Window stride')
 
     # T-Fixup
-    parser.add_argument('--Tfixup', default=False, type=bool, help='Using T-Fixup')
+    parser.add_argument('--Tfixup', default=True, type=bool, help='Using T-Fixup')
     parser.add_argument('--layer_norm', default=False, type=bool, help='T-Fixup with layer norm')
     
     # log

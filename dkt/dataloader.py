@@ -132,9 +132,9 @@ class Preprocess:
 
         self.args.USERID_COLUMN = ['userID']
         self.args.ANSWER_COLUMN = ['answerCode']
-        self.args.USE_COLUMN = ['assessmentItemID', 'classification', 'paperNum', 'problemNum', 'elapsed',  'Timestamp_2', 'KnowledgeTag']
-        self.args.continuous_embedding = [0, 0, 0, 0, 0, 0, 0]
-        self.args.EXCLUDE_COLUMN = ['testId',  'time_bin', 'hours', 'elapsed_continuous', 'Timestamp']
+        self.args.USE_COLUMN = ['assessmentItemID', 'classification', 'paperNum', 'problemNum', 'elapsed', 'elapsed_continuous', 'Timestamp_2', 'KnowledgeTag']
+        self.args.continuous_embedding = [0, 0, 0, 0, 0, 1, 1, 0]
+        self.args.EXCLUDE_COLUMN = ['testId',  'time_bin', 'hours', 'Timestamp']
 
         # use 3 features instead testId, assessmentItemID
         df['classification'] = df['testId'].str[2:3]
