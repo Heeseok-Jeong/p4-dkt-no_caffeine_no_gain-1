@@ -239,7 +239,12 @@ def process_batch(batch, args):
     interaction[:, 0] = 0 # set padding index to the first sequence
     interaction = (interaction * mask).to(torch.int64)
 
-    features = [((feature + 1) * mask).to(torch.int64) for feature in features]
+    features_list = []
+    for feature, continuous in zip(features, args.continuous_embedding):
+        if continuous == 0:
+            features_list.append(((feature + 1) * mask).to(torch.int64))
+        else:
+            features_list.append(((feature + 1) * mask).to(torch.float32))
 
 
     # gather index
@@ -249,7 +254,7 @@ def process_batch(batch, args):
 
 
     # device memory로 이동
-    features = [feature.to(args.device) for feature in features]
+    features_list = [feature.to(args.device) for feature in features_list]
 
     correct = correct.to(args.device)
     mask = mask.to(args.device)
@@ -257,7 +262,7 @@ def process_batch(batch, args):
     gather_index = gather_index.to(args.device)
 
 
-    output = tuple(features + [correct, mask, interaction, gather_index])
+    output = tuple(features_list + [correct, mask, interaction, gather_index])
 
     return output
 

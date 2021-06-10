@@ -132,15 +132,16 @@ class Preprocess:
 
         self.args.USERID_COLUMN = ['userID']
         self.args.ANSWER_COLUMN = ['answerCode']
-        self.args.USE_COLUMN = ['assessmentItemID', 'classification', 'paperNum', 'problemNum', 'elapsed', 'elapsed_continuous', 'Timestamp_2', 'KnowledgeTag']
-        self.args.continuous_embedding = [0, 0, 0, 0, 0, 1, 1, 0]
+        self.args.USE_COLUMN = ['assessmentItemID', 'classification', 'paperNum', 'problemNum', 'elapsed', 'Timestamp_2', 'assessmentItemID_mean', 'KnowledgeTag']
+        self.args.continuous_embedding = [0, 0, 0, 0, 1, 1, 1, 0]
         self.args.EXCLUDE_COLUMN = ['testId',  'time_bin', 'hours', 'Timestamp']
 
         # use 3 features instead testId, assessmentItemID
         df['classification'] = df['testId'].str[2:3]
         df['paperNum'] = df['testId'].str[-3:]
         df['problemNum'] = df['assessmentItemID'].str[-3:]
-        df['elapsed_continuous'] = df['elapsed']
+        df['assessmentItemID_mean'] = df.groupby(['assessmentItemID'])['answerCode'].transform(
+            'mean')  # 문제 번호 난이도 (정답률)
 
         df = df.astype({'Timestamp': 'datetime64[ns]'})
         def hours(timestamp):
@@ -168,8 +169,8 @@ class Preprocess:
         def convert_time(s):
             timestamp = time.mktime(datetime.strptime(s, '%Y-%m-%d %H:%M:%S').timetuple())
             timestamp = str(timestamp)
-            timestamp_2 = timestamp[4:10]
-            return int(timestamp_2)
+            timestamp_2 = timestamp[5:10]
+            return float(timestamp_2)
 
         tqdm.pandas()
 
