@@ -38,7 +38,7 @@ def parse_args(mode='train'):
 
     # TabNet
     parser.add_argument('--tabnet_pretrain', default=False, type=bool, help='tabnet pretrain')
-    parser.add_argument('--use_test_to_train', default=False, type=bool, help='train with testset')
+    parser.add_argument('--use_test_to_train', default=True, type=bool, help='train with testset')
     parser.add_argument('--tabnet_scheduler', default='steplr', type=str, help='tabnet_scheduler')
     parser.add_argument('--tabnet_optimizer', default='adam', type=str, help='tabnet_optimizer')
     parser.add_argument('--tabnet_lr', default=2e-2, type=float, help='tabnet_lr')
@@ -72,7 +72,7 @@ def parse_args(mode='train'):
     parser.add_argument('--log_steps', default=50, type=int, help='print log per n steps')
 
     # wandb
-    parser.add_argument('--use_wandb', default=True, type=bool, help='if you want to use wandb')
+    parser.add_argument('--use_wandb', default=False, type=bool, help='if you want to use wandb')
 
     ### 중요 ###
     parser.add_argument('--model', default='lstm', type=str, help='model type')

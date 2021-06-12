@@ -125,13 +125,13 @@ class Preprocess:
         self.args.ANSWER_COLUMN = ['answerCode']
         self.args.USE_COLUMN = ['user_acc','ItemID_mean','test_mean', 'KnowledgeTag','elapsed', 'item_order','user_total_correct_cnt','user_total_ans_cnt',	'user_total_acc', 'test_size', 'retest','user_test_ans_cnt', 'user_test_correct_cnt', 'tag_mean','ItemID_sum','tag_sum','time_bin', 'classification', 'paperNum', 'problemNum', 'item','assessmentItemID','testId', 'hours', 'test_sum']
         self.args.EXCLUDE_COLUMN = ['Timestamp']
-        
-        df['testId'] = df['testId'].str[1:]
-        df['assessmentItemID'] = df['assessmentItemID'].str[1:]
+
+        df['testId'] = df['testId'].astype('str').str[1:].astype('int')
+        df['assessmentItemID'] = df['assessmentItemID'].astype('str').str[1:].astype('int')
         # use 3 features instead testId, assessmentItemID
-        df['classification'] = df['testId'].str[2:3]
-        df['paperNum'] = df['testId'].str[-3:]
-        df['problemNum'] = df['assessmentItemID'].str[-3:]
+        df['classification'] = df['testId'].astype('str').str[2:3].astype('int')
+        df['paperNum'] = df['testId'].astype('str').str[-3:].astype('int')
+        df['problemNum'] = df['assessmentItemID'].astype('str').str[-3:].astype('int')
 
         df = df.astype({'Timestamp': 'datetime64[ns]', 'classification' : 'int', 'paperNum' : 'int', 'problemNum': 'int', 'assessmentItemID' : 'int'})
         def hours(timestamp):
@@ -171,9 +171,9 @@ class Preprocess:
         # args.use_test_to_train이 True일때 test셋도 학습에 사용
         if self.args.use_test_to_train:
             csv_file_path = os.path.join(self.args.data_dir, self.args.test_file_name)
-            test_df = pd.read_csv(csv_file)
+            test_df = pd.read_csv(csv_file_path)
             test_df = test_df[test_df.answerCode != -1].copy()
-            train_df += test_df
+            train_df = pd.concat([train_df, test_df], axis=0)
             print("test셋 학습에 추가!")
             
         train_df = self.__feature_engineering(train_df)
