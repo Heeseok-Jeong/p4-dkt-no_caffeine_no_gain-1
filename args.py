@@ -38,7 +38,8 @@ def parse_args(mode='train'):
 
     # TabNet
     parser.add_argument('--tabnet_pretrain', default=False, type=bool, help='tabnet pretrain')
-    parser.add_argument('--use_test_to_train', default=True, type=bool, help='train with testset')
+    parser.add_argument('--use_test_to_train', default=False, type=bool, help='train with testset')
+    parser.add_argument('--use_all_train', default=False, type=bool, help='train with all trainset')
     parser.add_argument('--tabnet_scheduler', default='steplr', type=str, help='tabnet_scheduler')
     parser.add_argument('--tabnet_optimizer', default='adam', type=str, help='tabnet_optimizer')
     parser.add_argument('--tabnet_lr', default=2e-2, type=float, help='tabnet_lr')
