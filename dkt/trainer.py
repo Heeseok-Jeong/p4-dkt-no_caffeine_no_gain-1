@@ -46,7 +46,9 @@ def tabnet_run(args, train_data, valid_data):
         pre_model, model = model.forward()
         pre_model.fit(
             X_train=train_data,
+            eval_name=['train'],
             eval_set=[valid_data],
+            eval_metric=['logloss'],
             pretraining_ratio=args.tabnet_pretraining_ratio
         )
         pre_model.save_model(f"{model_dir}/pre_model")
@@ -60,15 +62,11 @@ def tabnet_run(args, train_data, valid_data):
             from_unsupervised=pre_model
         )
         model.save_model(f"{model_dir}/model")
+
         if args.use_wandb:
-            for idx in range(len(model.history['train_auc'])):
+            for idx in range(len(pre_model.history['train_logloss'])):
                 wandb.log({
-                    'train_auc' : model.history['train_auc'][idx],
-                    'train_accuracy' : model.history['train_accuracy'][idx],
-                    'train_logloss' : model.history['train_logloss'][idx],
-                    'valid_full_auc' : model.history['valid_auc'][idx],
-                    'valid_full_accuracy' : model.history['valid_accuracy'][idx],
-                    'valid_full_logloss' : model.history['valid_logloss'][idx],
+                    'train_logloss': pre_model.history['train_logloss'][idx],
                 })
             
 
@@ -84,16 +82,23 @@ def tabnet_run(args, train_data, valid_data):
             batch_size=args.tabnet_batchsize, virtual_batch_size=args.tabnet_virtual_batchsize,
         )
         model.save_model(f"{model_dir}/model")
-        if args.use_wandb:
-            for idx in range(len(model.history['train_auc'])):
-                wandb.log({
-                    'train_auc' : model.history['train_auc'][idx],
-                    'train_accuracy' : model.history['train_accuracy'][idx],
-                    'train_logloss' : model.history['train_logloss'][idx],
-                    'valid_full_auc' : model.history['valid_auc'][idx],
-                    'valid_full_accuracy' : model.history['valid_accuracy'][idx],
-                    'valid_full_logloss' : model.history['valid_logloss'][idx],
-                })
+
+    if args.use_wandb:
+
+        data = [[name, prec] for (name, prec) in zip(args.USE_COLUMN, model.feature_importances_)]
+        table = wandb.Table(data=data, columns=["feature_name", "importance"])
+        wandb.log({"feature importances": wandb.plot.bar(table, "feature_name",
+                                                         "importance", title="feature importances")})
+
+        for idx in range(len(model.history['train_auc'])):
+            wandb.log({
+                'train_auc' : model.history['train_auc'][idx],
+                'train_accuracy' : model.history['train_accuracy'][idx],
+                'train_logloss' : model.history['train_logloss'][idx],
+                'valid_full_auc' : model.history['valid_auc'][idx],
+                'valid_full_accuracy' : model.history['valid_accuracy'][idx],
+                'valid_full_logloss' : model.history['valid_logloss'][idx],
+            })
 
             
 
