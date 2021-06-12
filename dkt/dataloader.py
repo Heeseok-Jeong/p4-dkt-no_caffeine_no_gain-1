@@ -168,6 +168,13 @@ class Preprocess:
         csv_file_path = os.path.join(self.args.data_dir, train_file_name)
         train_df = pd.read_csv(csv_file_path)#, nrows=100000)
         
+        if self.args.use_all_train:
+            csv_file_path = os.path.join(self.args.data_dir, valid_file_name)
+            valid_df = pd.read_csv(csv_file_path)
+            valid_df = self.__feature_engineering(valid_df)
+            train_df = pd.concat([train_df, valid_df], axis = 0)
+            print("전체 train셋 학습!")
+        
         # args.use_test_to_train이 True일때 test셋도 학습에 사용
         if self.args.use_test_to_train:
             csv_file_path = os.path.join(self.args.data_dir, self.args.test_file_name)
